@@ -1,12 +1,38 @@
 
-import React, { useState, useRef } from 'react';
-import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, X, ChevronDown } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, X, ChevronDown, History } from 'lucide-react';
 import { Modal } from './Modal';
+
+interface ProfileHistoryRecord {
+  id: string;
+  timestamp: string;
+  modifiedFields: string[];
+}
+
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  'Admin': 'สิทธิ์การเข้าถึงสูงสุด จัดการผู้ใช้งาน และตั้งค่าระบบทั้งหมด',
+  'Project Manager': 'บริหารจัดการโครงการ การจัดสรรทรัพยากร และดูรายงานภาพรวม',
+  'Site Engineer': 'ควบคุมงานหน้างาน บันทึกรายงานประจำวัน และติดตามสถานะงานช่าง',
+  'Staff': 'สนับสนุนงานทั่วไป คีย์ข้อมูล และตรวจสอบความถูกต้องเบื้องต้น',
+  'Sub-Contract': 'สิทธิ์จำกัด เข้าถึงได้เฉพาะงานที่ได้รับมอบหมายและรายงานหน้างาน'
+};
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const y = date.getFullYear();
+  const h = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  return `${d}/${m}/${y} ${h}:${min}`;
+};
 
 export const UserProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [history, setHistory] = useState<ProfileHistoryRecord[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -33,6 +59,13 @@ export const UserProfile: React.FC = () => {
 
   const [tempData, setTempData] = useState({ ...formData });
 
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('profile_change_history');
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
   const handleEdit = () => {
     setTempData({ ...formData });
     setIsEditing(true);
@@ -48,10 +81,27 @@ export const UserProfile: React.FC = () => {
   };
 
   const confirmSave = () => {
+    const modifiedFields: string[] = [];
+    if (tempData.firstName !== formData.firstName) modifiedFields.push('First Name');
+    if (tempData.lastName !== formData.lastName) modifiedFields.push('Last Name');
+    if (tempData.email !== formData.email) modifiedFields.push('Email');
+    if (tempData.phone !== formData.phone) modifiedFields.push('Phone');
+    if (tempData.role !== formData.role) modifiedFields.push('Role');
+    
+    if (modifiedFields.length > 0) {
+      const newRecord: ProfileHistoryRecord = {
+        id: Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString(),
+        modifiedFields
+      };
+      const updatedHistory = [newRecord, ...history].slice(0, 10);
+      setHistory(updatedHistory);
+      localStorage.setItem('profile_change_history', JSON.stringify(updatedHistory));
+    }
+
     setFormData({ ...tempData });
     setIsEditing(false);
     setShowConfirm(false);
-    // ในระบบจริงจะมีการเรียก API ที่นี่
   };
 
   const handleAvatarClick = () => {
@@ -72,7 +122,7 @@ export const UserProfile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+    <div className="max-w-5xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-blue-600 font-black text-xs uppercase tracking-[0.3em] mb-2 block">Settings</span>
@@ -160,6 +210,26 @@ export const UserProfile: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Change History Section */}
+          <div className="mt-10 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+             <h3 className="text-lg font-black text-slate-800 flex items-center gap-3 mb-6 tracking-tight uppercase">
+                <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center"><History className="w-4 h-4 text-slate-400" /></div>
+                Change History
+             </h3>
+             {history.length === 0 ? (
+               <p className="text-xs text-slate-400 font-medium italic">No recent changes recorded.</p>
+             ) : (
+               <div className="space-y-4">
+                 {history.map((record) => (
+                   <div key={record.id} className="border-l-2 border-blue-200 pl-4 py-1">
+                      <p className="text-[10px] font-bold text-slate-400 mb-1">{formatDate(record.timestamp)}</p>
+                      <p className="text-xs font-bold text-slate-700">Modified: <span className="text-blue-600">{record.modifiedFields.join(', ')}</span></p>
+                   </div>
+                 ))}
+               </div>
+             )}
+          </div>
         </div>
 
         {/* Edit Form */}
@@ -170,77 +240,64 @@ export const UserProfile: React.FC = () => {
               Personal Information
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">First Name</label>
-                <input 
-                  type="text" 
-                  disabled={!isEditing}
-                  value={isEditing ? tempData.firstName : formData.firstName}
-                  onChange={(e) => setTempData({...tempData, firstName: e.target.value})}
-                  className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
-                    isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
-                  }`}
-                />
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Last Name</label>
-                <input 
-                  type="text" 
-                  disabled={!isEditing}
-                  value={isEditing ? tempData.lastName : formData.lastName}
-                  onChange={(e) => setTempData({...tempData, lastName: e.target.value})}
-                  className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
-                    isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
-                  }`}
-                />
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Official Email</label>
-                <div className="relative">
-                  <Mail className={`w-4 h-4 absolute left-6 top-1/2 -translate-y-1/2 ${isEditing ? 'text-blue-500' : 'text-slate-300'}`} />
-                  <input 
-                    type="email" 
-                    disabled={!isEditing}
-                    value={isEditing ? tempData.email : formData.email}
-                    onChange={(e) => setTempData({...tempData, email: e.target.value})}
-                    className={`w-full pl-14 pr-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
-                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
-                    }`}
-                  />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contact Number</label>
-                <div className="relative">
-                  <Phone className={`w-4 h-4 absolute left-6 top-1/2 -translate-y-1/2 ${isEditing ? 'text-blue-500' : 'text-slate-300'}`} />
-                  <input 
-                    type="tel" 
-                    disabled={!isEditing}
-                    value={isEditing ? tempData.phone : formData.phone}
-                    onChange={(e) => setTempData({...tempData, phone: e.target.value})}
-                    className={`w-full pl-14 pr-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
-                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
-                    }`}
-                  />
-                </div>
-              </div>
-              <div className="md:col-span-2 space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">System Role</label>
-                <div className="relative">
-                  <select 
-                    disabled={!isEditing}
-                    value={isEditing ? tempData.role : formData.role}
-                    onChange={(e) => setTempData({...tempData, role: e.target.value})}
-                    className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all appearance-none ${
-                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 cursor-pointer' : 'bg-transparent text-slate-400'
-                    }`}
-                  >
-                    {roles.map(role => (
-                      <option key={role} value={role}>{role}</option>
-                    ))}
-                  </select>
-                  {isEditing && <ChevronDown className="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />}
+            <div className="space-y-6">
+              <ProfileInputRow 
+                label="First Name" 
+                value={isEditing ? tempData.firstName : formData.firstName} 
+                disabled={!isEditing} 
+                onChange={(v) => setTempData({...tempData, firstName: v})} 
+              />
+              <ProfileInputRow 
+                label="Last Name" 
+                value={isEditing ? tempData.lastName : formData.lastName} 
+                disabled={!isEditing} 
+                onChange={(v) => setTempData({...tempData, lastName: v})} 
+              />
+              <ProfileInputRow 
+                label="Official Email" 
+                icon={<Mail className="w-4 h-4" />}
+                value={isEditing ? tempData.email : formData.email} 
+                disabled={!isEditing} 
+                onChange={(v) => setTempData({...tempData, email: v})} 
+                type="email"
+              />
+              <ProfileInputRow 
+                label="Contact Number" 
+                icon={<Phone className="w-4 h-4" />}
+                value={isEditing ? tempData.phone : formData.phone} 
+                disabled={!isEditing} 
+                onChange={(v) => setTempData({...tempData, phone: v})} 
+                type="tel"
+              />
+
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-10 py-4 border-b border-slate-50 last:border-0">
+                <label className="sm:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">System Role</label>
+                <div className="flex-1 space-y-4">
+                  <div className="relative">
+                    <select 
+                      disabled={!isEditing}
+                      value={isEditing ? tempData.role : formData.role}
+                      onChange={(e) => setTempData({...tempData, role: e.target.value})}
+                      className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all appearance-none ${
+                        isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 cursor-pointer' : 'bg-transparent text-slate-400'
+                      }`}
+                    >
+                      {roles.map(role => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
+                    </select>
+                    {isEditing && <ChevronDown className="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />}
+                  </div>
+                  
+                  {/* Role Description Block */}
+                  <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
+                     <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <Shield className="w-3 h-3" /> Role Permissions
+                     </p>
+                     <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                        {ROLE_DESCRIPTIONS[isEditing ? tempData.role : formData.role]}
+                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -317,6 +374,35 @@ export const UserProfile: React.FC = () => {
     </div>
   );
 };
+
+const ProfileInputRow: React.FC<{ 
+  label: string; 
+  value: string; 
+  disabled: boolean; 
+  onChange: (v: string) => void; 
+  icon?: React.ReactNode;
+  type?: string;
+}> = ({ label, value, disabled, onChange, icon, type = "text" }) => (
+  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-10 py-4 border-b border-slate-50 last:border-0 group transition-all hover:bg-slate-50/50 -mx-4 px-4 rounded-xl">
+    <label className="sm:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</label>
+    <div className="flex-1 relative">
+      {icon && (
+        <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-colors ${disabled ? 'text-slate-300' : 'text-blue-500'}`}>
+          {icon}
+        </div>
+      )}
+      <input 
+        type={type}
+        disabled={disabled}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full py-4 border-none rounded-2xl text-sm font-bold transition-all ${icon ? 'pl-14 pr-6' : 'px-6'} ${
+          disabled ? 'bg-transparent text-slate-400' : 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 shadow-sm'
+        }`}
+      />
+    </div>
+  </div>
+);
 
 const NotificationToggle: React.FC<{ label: string, active: boolean, onToggle: () => void }> = ({ 
   label, active, onToggle 
