@@ -1,0 +1,7 @@
+{
+  "name": "ArchiPro Construction Management",
+  "description": "A luxury, professional-grade construction project management system for enterprise contractors. Features contract management, Gantt charts, Kanban boards, and real-time inventory tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
