@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, X, ChevronDown, History } from 'lucide-react';
+import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, History, ChevronDown } from 'lucide-react';
 import { Modal } from './Modal';
 
 interface ProfileHistoryRecord {
@@ -10,11 +10,11 @@ interface ProfileHistoryRecord {
 }
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
-  'Admin': 'สิทธิ์การเข้าถึงสูงสุด จัดการผู้ใช้งาน และตั้งค่าระบบทั้งหมด',
-  'Project Manager': 'บริหารจัดการโครงการ การจัดสรรทรัพยากร และดูรายงานภาพรวม',
-  'Site Engineer': 'ควบคุมงานหน้างาน บันทึกรายงานประจำวัน และติดตามสถานะงานช่าง',
-  'Staff': 'สนับสนุนงานทั่วไป คีย์ข้อมูล และตรวจสอบความถูกต้องเบื้องต้น',
-  'Sub-Contract': 'สิทธิ์จำกัด เข้าถึงได้เฉพาะงานที่ได้รับมอบหมายและรายงานหน้างาน'
+  'Admin': 'สิทธิ์สูงสุด: จัดการผู้ใช้งาน, กำหนดสิทธิ์ระบบ, เข้าถึงข้อมูลการเงินและสัญญาทั้งหมด',
+  'Project Manager': 'สิทธิ์บริหาร: จัดการทุกโครงการ, อนุมัติแผนงานและงบประมาณ, ดูรายงานภาพรวมระดับบริษัท',
+  'Site Engineer': 'สิทธิ์หน้างาน: บันทึกรายงานประจำวัน, อัปเดตสถานะงาน, ตรวจสอบวัสดุและเครื่องจักรหน้างาน',
+  'Staff': 'สิทธิ์ทั่วไป: บันทึกข้อมูลพื้นฐาน, ดูรายละเอียดงานที่ได้รับมอบหมาย, พิมพ์เอกสารเบื้องต้น',
+  'Sub-Contract': 'สิทธิ์จำกัด: อัปเดตเฉพาะงานจ้างเหมาที่รับผิดชอบ, บันทึกจำนวนคนงานรายวัน'
 };
 
 const formatDate = (dateStr: string) => {
@@ -82,11 +82,11 @@ export const UserProfile: React.FC = () => {
 
   const confirmSave = () => {
     const modifiedFields: string[] = [];
-    if (tempData.firstName !== formData.firstName) modifiedFields.push('First Name');
-    if (tempData.lastName !== formData.lastName) modifiedFields.push('Last Name');
-    if (tempData.email !== formData.email) modifiedFields.push('Email');
-    if (tempData.phone !== formData.phone) modifiedFields.push('Phone');
-    if (tempData.role !== formData.role) modifiedFields.push('Role');
+    if (tempData.firstName !== formData.firstName) modifiedFields.push('ชื่อ');
+    if (tempData.lastName !== formData.lastName) modifiedFields.push('นามสกุล');
+    if (tempData.email !== formData.email) modifiedFields.push('อีเมล');
+    if (tempData.phone !== formData.phone) modifiedFields.push('เบอร์โทรศัพท์');
+    if (tempData.role !== formData.role) modifiedFields.push('บทบาท');
     
     if (modifiedFields.length > 0) {
       const newRecord: ProfileHistoryRecord = {
@@ -114,20 +114,18 @@ export const UserProfile: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result as string);
-      };
+      reader.onloadend = () => setAvatar(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
+    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-blue-600 font-black text-xs uppercase tracking-[0.3em] mb-2 block">Settings</span>
           <h1 className="text-4xl font-black text-slate-800 tracking-tighter">โปรไฟล์ผู้ใช้งาน</h1>
-          <p className="text-slate-500 mt-2 font-medium">จัดการตัวตนของคุณและสิทธิ์การเข้าถึงในระบบ</p>
+          <p className="text-slate-500 mt-2 font-medium">จัดการตัวตนและสิทธิ์การเข้าถึงข้อมูลในระบบองค์กร</p>
         </div>
         {!isEditing ? (
           <button 
@@ -139,139 +137,71 @@ export const UserProfile: React.FC = () => {
           </button>
         ) : (
           <div className="flex gap-3">
-            <button 
-              onClick={handleCancel}
-              className="px-8 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-[1.5rem] transition-all"
-            >
-              ยกเลิก
-            </button>
-            <button 
-              onClick={requestSave}
-              className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-[1.5rem] font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95"
-            >
-              <Save className="w-4 h-4" />
-              บันทึกข้อมูล
+            <button onClick={handleCancel} className="px-8 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-[1.5rem] transition-all">ยกเลิก</button>
+            <button onClick={requestSave} className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-[1.5rem] font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95">
+              <Save className="w-4 h-4" /> บันทึกข้อมูล
             </button>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Avatar Card */}
-        <div className="lg:col-span-1">
+        {/* Profile Card & History */}
+        <div className="lg:col-span-1 space-y-10">
           <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-50 to-slate-50 -z-0"></div>
-            
-            <div 
-              className={`relative z-10 ${isEditing ? 'cursor-pointer' : ''}`}
-              onClick={handleAvatarClick}
-            >
+            <div className={`relative z-10 ${isEditing ? 'cursor-pointer' : ''}`} onClick={handleAvatarClick}>
               <div className="w-36 h-36 rounded-[2.5rem] bg-white flex items-center justify-center text-blue-600 text-5xl font-black border-8 border-white shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
-                {avatar ? (
-                  <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  formData.firstName.charAt(0) + formData.lastName.charAt(0)
-                )}
+                {avatar ? <img src={avatar} className="w-full h-full object-cover" /> : formData.firstName.charAt(0) + formData.lastName.charAt(0)}
               </div>
               {isEditing && (
                 <div className="absolute inset-0 bg-blue-600/60 rounded-[2.5rem] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
-                  <div className="text-center">
-                    <Camera className="w-8 h-8 mx-auto mb-1" />
-                    <span className="text-[10px] font-black uppercase">Change</span>
-                  </div>
+                  <Camera className="w-8 h-8" />
                 </div>
               )}
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
-                accept="image/*"
-              />
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
             </div>
-
             <div className="mt-8 z-10">
               <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{formData.firstName} {formData.lastName}</h2>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">{formData.role}</span>
-              </div>
-            </div>
-
-            <div className="mt-10 pt-10 border-t border-slate-50 w-full flex flex-col gap-4 z-10">
-              <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-widest">
-                <span>Account Status</span>
-                <span className="text-emerald-500 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Verified
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-500 font-medium text-sm bg-slate-50 p-4 rounded-2xl">
-                <Shield className="w-4 h-4 text-blue-500" />
-                <span>Enterprise User #8841</span>
-              </div>
+              <span className="mt-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest block">{formData.role}</span>
             </div>
           </div>
 
-          {/* Change History Section */}
-          <div className="mt-10 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-             <h3 className="text-lg font-black text-slate-800 flex items-center gap-3 mb-6 tracking-tight uppercase">
-                <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center"><History className="w-4 h-4 text-slate-400" /></div>
-                Change History
-             </h3>
-             {history.length === 0 ? (
-               <p className="text-xs text-slate-400 font-medium italic">No recent changes recorded.</p>
-             ) : (
-               <div className="space-y-4">
-                 {history.map((record) => (
-                   <div key={record.id} className="border-l-2 border-blue-200 pl-4 py-1">
-                      <p className="text-[10px] font-bold text-slate-400 mb-1">{formatDate(record.timestamp)}</p>
-                      <p className="text-xs font-bold text-slate-700">Modified: <span className="text-blue-600">{record.modifiedFields.join(', ')}</span></p>
-                   </div>
-                 ))}
-               </div>
-             )}
+          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <h3 className="text-lg font-black text-slate-800 flex items-center gap-3 mb-6 tracking-tight uppercase">
+              <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center"><History className="w-4 h-4 text-slate-400" /></div>
+              ประวัติการเปลี่ยนแปลง
+            </h3>
+            {history.length === 0 ? (
+              <p className="text-xs text-slate-400 font-medium italic">ยังไม่มีประวัติการบันทึกข้อมูล</p>
+            ) : (
+              <div className="space-y-4">
+                {history.map((record) => (
+                  <div key={record.id} className="border-l-2 border-blue-200 pl-4 py-1">
+                    <p className="text-[10px] font-bold text-slate-400 mb-1">{formatDate(record.timestamp)}</p>
+                    <p className="text-xs font-bold text-slate-700">แก้ไข: <span className="text-blue-600">{record.modifiedFields.join(', ')}</span></p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Edit Form */}
+        {/* Form Sections */}
         <div className="lg:col-span-2 space-y-8">
           <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-3 mb-10 tracking-tight uppercase">
               <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><User className="w-4 h-4 text-blue-600" /></div>
               Personal Information
             </h3>
-            
-            <div className="space-y-6">
-              <ProfileInputRow 
-                label="First Name" 
-                value={isEditing ? tempData.firstName : formData.firstName} 
-                disabled={!isEditing} 
-                onChange={(v) => setTempData({...tempData, firstName: v})} 
-              />
-              <ProfileInputRow 
-                label="Last Name" 
-                value={isEditing ? tempData.lastName : formData.lastName} 
-                disabled={!isEditing} 
-                onChange={(v) => setTempData({...tempData, lastName: v})} 
-              />
-              <ProfileInputRow 
-                label="Official Email" 
-                icon={<Mail className="w-4 h-4" />}
-                value={isEditing ? tempData.email : formData.email} 
-                disabled={!isEditing} 
-                onChange={(v) => setTempData({...tempData, email: v})} 
-                type="email"
-              />
-              <ProfileInputRow 
-                label="Contact Number" 
-                icon={<Phone className="w-4 h-4" />}
-                value={isEditing ? tempData.phone : formData.phone} 
-                disabled={!isEditing} 
-                onChange={(v) => setTempData({...tempData, phone: v})} 
-                type="tel"
-              />
-
-              <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-10 py-4 border-b border-slate-50 last:border-0">
-                <label className="sm:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">System Role</label>
+            <div className="space-y-2">
+              <ProfileInputRow label="ชื่อ" value={isEditing ? tempData.firstName : formData.firstName} disabled={!isEditing} onChange={(v) => setTempData({...tempData, firstName: v})} />
+              <ProfileInputRow label="นามสกุล" value={isEditing ? tempData.lastName : formData.lastName} disabled={!isEditing} onChange={(v) => setTempData({...tempData, lastName: v})} />
+              <ProfileInputRow label="อีเมลทางการ" icon={<Mail className="w-4 h-4" />} value={isEditing ? tempData.email : formData.email} disabled={!isEditing} onChange={(v) => setTempData({...tempData, email: v})} type="email" />
+              <ProfileInputRow label="เบอร์โทรศัพท์" icon={<Phone className="w-4 h-4" />} value={isEditing ? tempData.phone : formData.phone} disabled={!isEditing} onChange={(v) => setTempData({...tempData, phone: v})} type="tel" />
+              
+              <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-10 py-6 border-b border-slate-50 last:border-0">
+                <label className="md:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">บทบาทในระบบ</label>
                 <div className="flex-1 space-y-4">
                   <div className="relative">
                     <select 
@@ -282,21 +212,17 @@ export const UserProfile: React.FC = () => {
                         isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 cursor-pointer' : 'bg-transparent text-slate-400'
                       }`}
                     >
-                      {roles.map(role => (
-                        <option key={role} value={role}>{role}</option>
-                      ))}
+                      {roles.map(role => <option key={role} value={role}>{role}</option>)}
                     </select>
                     {isEditing && <ChevronDown className="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />}
                   </div>
-                  
-                  {/* Role Description Block */}
                   <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-                     <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1 flex items-center gap-2">
-                        <Shield className="w-3 h-3" /> Role Permissions
-                     </p>
-                     <p className="text-xs font-medium text-slate-600 leading-relaxed">
-                        {ROLE_DESCRIPTIONS[isEditing ? tempData.role : formData.role]}
-                     </p>
+                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                      <Shield className="w-3 h-3" /> รายละเอียดสิทธิ์ (Permissions)
+                    </p>
+                    <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                      {ROLE_DESCRIPTIONS[isEditing ? tempData.role : formData.role]}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -306,41 +232,13 @@ export const UserProfile: React.FC = () => {
           <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <h3 className="text-xl font-black text-slate-800 flex items-center gap-3 mb-10 tracking-tight uppercase">
                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><Bell className="w-4 h-4 text-blue-600" /></div>
-               Notifications Settings
+               การแจ้งเตือน
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <NotificationToggle 
-                label="Email Updates" 
-                active={isEditing ? tempData.notifications.email : formData.notifications.email}
-                onToggle={() => isEditing && setTempData({
-                  ...tempData, 
-                  notifications: {...tempData.notifications, email: !tempData.notifications.email}
-                })}
-              />
-              <NotificationToggle 
-                label="Push Notifications" 
-                active={isEditing ? tempData.notifications.push : formData.notifications.push}
-                onToggle={() => isEditing && setTempData({
-                  ...tempData, 
-                  notifications: {...tempData.notifications, push: !tempData.notifications.push}
-                })}
-              />
-              <NotificationToggle 
-                label="SMS Alerts" 
-                active={isEditing ? tempData.notifications.sms : formData.notifications.sms}
-                onToggle={() => isEditing && setTempData({
-                  ...tempData, 
-                  notifications: {...tempData.notifications, sms: !tempData.notifications.sms}
-                })}
-              />
-              <NotificationToggle 
-                label="In-app Notification" 
-                active={isEditing ? tempData.notifications.inApp : formData.notifications.inApp}
-                onToggle={() => isEditing && setTempData({
-                  ...tempData, 
-                  notifications: {...tempData.notifications, inApp: !tempData.notifications.inApp}
-                })}
-              />
+              <NotificationToggle label="อีเมลอัปเดตงาน" active={isEditing ? tempData.notifications.email : formData.notifications.email} onToggle={() => isEditing && setTempData({...tempData, notifications: {...tempData.notifications, email: !tempData.notifications.email}})} />
+              <NotificationToggle label="Push Notifications" active={isEditing ? tempData.notifications.push : formData.notifications.push} onToggle={() => isEditing && setTempData({...tempData, notifications: {...tempData.notifications, push: !tempData.notifications.push}})} />
+              <NotificationToggle label="แจ้งเตือน SMS ด่วน" active={isEditing ? tempData.notifications.sms : formData.notifications.sms} onToggle={() => isEditing && setTempData({...tempData, notifications: {...tempData.notifications, sms: !tempData.notifications.sms}})} />
+              <NotificationToggle label="การแจ้งเตือนในแอป" active={isEditing ? tempData.notifications.inApp : formData.notifications.inApp} onToggle={() => isEditing && setTempData({...tempData, notifications: {...tempData.notifications, inApp: !tempData.notifications.inApp}})} />
             </div>
           </div>
         </div>
@@ -348,26 +246,14 @@ export const UserProfile: React.FC = () => {
 
       <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="ยืนยันการบันทึก">
         <div className="text-center space-y-8 p-4">
-          <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-            <AlertCircle className="w-12 h-12" />
-          </div>
+          <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-inner"><AlertCircle className="w-12 h-12" /></div>
           <div>
-            <h3 className="text-2xl font-black text-slate-800 tracking-tighter mb-2">Are you sure?</h3>
-            <p className="text-slate-500 font-medium">คุณยืนยันที่จะบันทึกการเปลี่ยนแปลงข้อมูลทั้งหมดนี้ใช่หรือไม่?</p>
+            <h3 className="text-2xl font-black text-slate-800 tracking-tighter mb-2">ยืนยันการเปลี่ยนแปลง?</h3>
+            <p className="text-slate-500 font-medium">คุณกำลังจะบันทึกข้อมูลใหม่และบันทึกลงในประวัติประวัติการใช้งาน</p>
           </div>
           <div className="flex gap-4">
-            <button 
-              onClick={() => setShowConfirm(false)}
-              className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={confirmSave}
-              className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
-            >
-              Confirm & Save
-            </button>
+            <button onClick={() => setShowConfirm(false)} className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all">ยกเลิก</button>
+            <button onClick={confirmSave} className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">ตกลงและบันทึก</button>
           </div>
         </div>
       </Modal>
@@ -375,27 +261,12 @@ export const UserProfile: React.FC = () => {
   );
 };
 
-const ProfileInputRow: React.FC<{ 
-  label: string; 
-  value: string; 
-  disabled: boolean; 
-  onChange: (v: string) => void; 
-  icon?: React.ReactNode;
-  type?: string;
-}> = ({ label, value, disabled, onChange, icon, type = "text" }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-10 py-4 border-b border-slate-50 last:border-0 group transition-all hover:bg-slate-50/50 -mx-4 px-4 rounded-xl">
-    <label className="sm:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</label>
+const ProfileInputRow: React.FC<{ label: string; value: string; disabled: boolean; onChange: (v: string) => void; icon?: React.ReactNode; type?: string; }> = ({ label, value, disabled, onChange, icon, type = "text" }) => (
+  <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-10 py-6 border-b border-slate-50 last:border-0 transition-all hover:bg-slate-50/50 -mx-4 px-4 rounded-xl group">
+    <label className="md:w-1/3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</label>
     <div className="flex-1 relative">
-      {icon && (
-        <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-colors ${disabled ? 'text-slate-300' : 'text-blue-500'}`}>
-          {icon}
-        </div>
-      )}
-      <input 
-        type={type}
-        disabled={disabled}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+      {icon && <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-colors ${disabled ? 'text-slate-300' : 'text-blue-500'}`}>{icon}</div>}
+      <input type={type} disabled={disabled} value={value} onChange={(e) => onChange(e.target.value)}
         className={`w-full py-4 border-none rounded-2xl text-sm font-bold transition-all ${icon ? 'pl-14 pr-6' : 'px-6'} ${
           disabled ? 'bg-transparent text-slate-400' : 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 shadow-sm'
         }`}
@@ -404,15 +275,8 @@ const ProfileInputRow: React.FC<{
   </div>
 );
 
-const NotificationToggle: React.FC<{ label: string, active: boolean, onToggle: () => void }> = ({ 
-  label, active, onToggle 
-}) => (
-  <div 
-    onClick={onToggle}
-    className={`flex items-center justify-between p-6 rounded-3xl border transition-all cursor-pointer ${
-      active ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-slate-50 border-slate-50 text-slate-500 hover:border-slate-200'
-    }`}
-  >
+const NotificationToggle: React.FC<{ label: string, active: boolean, onToggle: () => void }> = ({ label, active, onToggle }) => (
+  <div onClick={onToggle} className={`flex items-center justify-between p-6 rounded-3xl border transition-all cursor-pointer ${active ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-slate-50 border-slate-50 text-slate-500 hover:border-slate-200'}`}>
     <span className="text-sm font-bold uppercase tracking-tight">{label}</span>
     <div className={`w-10 h-6 rounded-full relative transition-all ${active ? 'bg-white/30' : 'bg-slate-300'}`}>
       <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${active ? 'left-5' : 'left-1'}`} />
