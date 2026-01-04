@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, X } from 'lucide-react';
+import { User, Mail, Phone, Shield, Bell, Check, Save, Edit2, Camera, AlertCircle, X, ChevronDown } from 'lucide-react';
 import { Modal } from './Modal';
 
 export const UserProfile: React.FC = () => {
@@ -51,8 +51,7 @@ export const UserProfile: React.FC = () => {
     setFormData({ ...tempData });
     setIsEditing(false);
     setShowConfirm(false);
-    // Simulate API call success notification
-    alert('บันทึกข้อมูลเรียบร้อยแล้ว');
+    // ในระบบจริงจะมีการเรียก API ที่นี่
   };
 
   const handleAvatarClick = () => {
@@ -73,31 +72,32 @@ export const UserProfile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <div className="flex items-center justify-between">
+    <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">โปรไฟล์ผู้ใช้</h1>
-          <p className="text-slate-500 mt-1">จัดการข้อมูลส่วนตัวและการตั้งค่าการใช้งานของคุณ</p>
+          <span className="text-blue-600 font-black text-xs uppercase tracking-[0.3em] mb-2 block">Settings</span>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tighter">โปรไฟล์ผู้ใช้งาน</h1>
+          <p className="text-slate-500 mt-2 font-medium">จัดการตัวตนของคุณและสิทธิ์การเข้าถึงในระบบ</p>
         </div>
         {!isEditing ? (
           <button 
             onClick={handleEdit}
-            className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 shadow-sm transition-all active:scale-95"
+            className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-800 rounded-[1.5rem] font-bold hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all active:scale-95"
           >
-            <Edit2 className="w-4 h-4" />
-            แก้ไขข้อมูล
+            <Edit2 className="w-4 h-4 text-blue-500" />
+            แก้ไขข้อมูลส่วนตัว
           </button>
         ) : (
           <div className="flex gap-3">
             <button 
               onClick={handleCancel}
-              className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-100 rounded-xl transition-all"
+              className="px-8 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-[1.5rem] transition-all"
             >
               ยกเลิก
             </button>
             <button 
               onClick={requestSave}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
+              className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-[1.5rem] font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95"
             >
               <Save className="w-4 h-4" />
               บันทึกข้อมูล
@@ -106,15 +106,17 @@ export const UserProfile: React.FC = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Avatar Card */}
-        <div className="md:col-span-1 space-y-6">
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center text-center">
+        <div className="lg:col-span-1">
+          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-50 to-slate-50 -z-0"></div>
+            
             <div 
-              className={`relative group ${isEditing ? 'cursor-pointer' : ''}`}
+              className={`relative z-10 ${isEditing ? 'cursor-pointer' : ''}`}
               onClick={handleAvatarClick}
             >
-              <div className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-4xl font-bold border-4 border-white shadow-xl overflow-hidden">
+              <div className="w-36 h-36 rounded-[2.5rem] bg-white flex items-center justify-center text-blue-600 text-5xl font-black border-8 border-white shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                 {avatar ? (
                   <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -122,8 +124,11 @@ export const UserProfile: React.FC = () => {
                 )}
               </div>
               {isEditing && (
-                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-8 h-8" />
+                <div className="absolute inset-0 bg-blue-600/60 rounded-[2.5rem] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
+                  <div className="text-center">
+                    <Camera className="w-8 h-8 mx-auto mb-1" />
+                    <span className="text-[10px] font-black uppercase">Change</span>
+                  </div>
                 </div>
               )}
               <input 
@@ -134,108 +139,121 @@ export const UserProfile: React.FC = () => {
                 accept="image/*"
               />
             </div>
-            <h2 className="mt-6 text-xl font-bold text-slate-800">{formData.firstName} {formData.lastName}</h2>
-            <p className="text-blue-600 font-semibold text-sm mt-1">{formData.role}</p>
-            <div className="mt-6 pt-6 border-t border-slate-50 w-full flex flex-col gap-3">
-              <div className="flex items-center gap-3 text-slate-500 text-sm">
-                <Shield className="w-4 h-4 text-slate-300" />
-                <span>สถานะ: พนักงานประจำ</span>
+
+            <div className="mt-8 z-10">
+              <h2 className="text-2xl font-black text-slate-800 tracking-tighter">{formData.firstName} {formData.lastName}</h2>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">{formData.role}</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-500 text-sm">
-                <Check className="w-4 h-4 text-emerald-500" />
-                <span>ยืนยันตัวตนแล้ว</span>
+            </div>
+
+            <div className="mt-10 pt-10 border-t border-slate-50 w-full flex flex-col gap-4 z-10">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-widest">
+                <span>Account Status</span>
+                <span className="text-emerald-500 flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Verified
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-slate-500 font-medium text-sm bg-slate-50 p-4 rounded-2xl">
+                <Shield className="w-4 h-4 text-blue-500" />
+                <span>Enterprise User #8841</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Info Forms */}
-        <div className="md:col-span-2 space-y-6">
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-500" /> ข้อมูลการติดต่อ
+        {/* Edit Form */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <h3 className="text-xl font-black text-slate-800 flex items-center gap-3 mb-10 tracking-tight uppercase">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><User className="w-4 h-4 text-blue-600" /></div>
+              Personal Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">ชื่อ</label>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">First Name</label>
                 <input 
                   type="text" 
                   disabled={!isEditing}
                   value={isEditing ? tempData.firstName : formData.firstName}
                   onChange={(e) => setTempData({...tempData, firstName: e.target.value})}
-                  className={`w-full px-4 py-3 border-none rounded-xl text-sm transition-all ${
-                    isEditing ? 'bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-100' : 'bg-transparent text-slate-500 font-medium'
+                  className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
+                    isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
                   }`}
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">นามสกุล</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Last Name</label>
                 <input 
                   type="text" 
                   disabled={!isEditing}
                   value={isEditing ? tempData.lastName : formData.lastName}
                   onChange={(e) => setTempData({...tempData, lastName: e.target.value})}
-                  className={`w-full px-4 py-3 border-none rounded-xl text-sm transition-all ${
-                    isEditing ? 'bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-100' : 'bg-transparent text-slate-500 font-medium'
+                  className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
+                    isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
                   }`}
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">อีเมล</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Official Email</label>
                 <div className="relative">
-                  <Mail className={`w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 ${isEditing ? 'text-slate-300' : 'text-slate-400'}`} />
+                  <Mail className={`w-4 h-4 absolute left-6 top-1/2 -translate-y-1/2 ${isEditing ? 'text-blue-500' : 'text-slate-300'}`} />
                   <input 
                     type="email" 
                     disabled={!isEditing}
                     value={isEditing ? tempData.email : formData.email}
                     onChange={(e) => setTempData({...tempData, email: e.target.value})}
-                    className={`w-full pl-11 pr-4 py-3 border-none rounded-xl text-sm transition-all ${
-                      isEditing ? 'bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-100' : 'bg-transparent text-slate-500 font-medium'
+                    className={`w-full pl-14 pr-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
+                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
                     }`}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">เบอร์โทรศัพท์</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contact Number</label>
                 <div className="relative">
-                  <Phone className={`w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 ${isEditing ? 'text-slate-300' : 'text-slate-400'}`} />
+                  <Phone className={`w-4 h-4 absolute left-6 top-1/2 -translate-y-1/2 ${isEditing ? 'text-blue-500' : 'text-slate-300'}`} />
                   <input 
                     type="tel" 
                     disabled={!isEditing}
                     value={isEditing ? tempData.phone : formData.phone}
                     onChange={(e) => setTempData({...tempData, phone: e.target.value})}
-                    className={`w-full pl-11 pr-4 py-3 border-none rounded-xl text-sm transition-all ${
-                      isEditing ? 'bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-100' : 'bg-transparent text-slate-500 font-medium'
+                    className={`w-full pl-14 pr-6 py-4 border-none rounded-2xl text-sm font-bold transition-all ${
+                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100' : 'bg-transparent text-slate-400'
                     }`}
                   />
                 </div>
               </div>
-              <div className="md:col-span-2 space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">สิทธิ์การใช้งาน (Role)</label>
-                <select 
-                  disabled={!isEditing}
-                  value={isEditing ? tempData.role : formData.role}
-                  onChange={(e) => setTempData({...tempData, role: e.target.value})}
-                  className={`w-full px-4 py-3 border-none rounded-xl text-sm transition-all appearance-none ${
-                    isEditing ? 'bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-100 cursor-pointer' : 'bg-transparent text-slate-500 font-medium'
-                  }`}
-                >
-                  {roles.map(role => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
+              <div className="md:col-span-2 space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">System Role</label>
+                <div className="relative">
+                  <select 
+                    disabled={!isEditing}
+                    value={isEditing ? tempData.role : formData.role}
+                    onChange={(e) => setTempData({...tempData, role: e.target.value})}
+                    className={`w-full px-6 py-4 border-none rounded-2xl text-sm font-bold transition-all appearance-none ${
+                      isEditing ? 'bg-slate-50 text-slate-800 ring-2 ring-transparent focus:ring-blue-100 cursor-pointer' : 'bg-transparent text-slate-400'
+                    }`}
+                  >
+                    {roles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                  {isEditing && <ChevronDown className="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-blue-500" /> ตั้งค่าการแจ้งเตือน
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <h3 className="text-xl font-black text-slate-800 flex items-center gap-3 mb-10 tracking-tight uppercase">
+               <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><Bell className="w-4 h-4 text-blue-600" /></div>
+               Notifications Settings
             </h3>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <NotificationToggle 
-                label="การแจ้งเตือนทางอีเมล" 
-                description="รับสรุปผลงานรายสัปดาห์และข่าวสารบริษัท" 
+                label="Email Updates" 
                 active={isEditing ? tempData.notifications.email : formData.notifications.email}
                 onToggle={() => isEditing && setTempData({
                   ...tempData, 
@@ -243,8 +261,7 @@ export const UserProfile: React.FC = () => {
                 })}
               />
               <NotificationToggle 
-                label="การแจ้งเตือนแบบ Push" 
-                description="แจ้งเตือนเมื่อมีงานใหม่หรือความคืบหน้าโครงการ" 
+                label="Push Notifications" 
                 active={isEditing ? tempData.notifications.push : formData.notifications.push}
                 onToggle={() => isEditing && setTempData({
                   ...tempData, 
@@ -252,8 +269,7 @@ export const UserProfile: React.FC = () => {
                 })}
               />
               <NotificationToggle 
-                label="การแจ้งเตือนทาง SMS" 
-                description="แจ้งเตือนด่วนสำหรับปัญหาหน้างานระดับวิกฤต" 
+                label="SMS Alerts" 
                 active={isEditing ? tempData.notifications.sms : formData.notifications.sms}
                 onToggle={() => isEditing && setTempData({
                   ...tempData, 
@@ -261,8 +277,7 @@ export const UserProfile: React.FC = () => {
                 })}
               />
               <NotificationToggle 
-                label="การแจ้งเตือนในแอป (In-app)" 
-                description="แสดงจุดแจ้งเตือนบนแถบเครื่องมือเมื่อมีความเคลื่อนไหว" 
+                label="In-app Notification" 
                 active={isEditing ? tempData.notifications.inApp : formData.notifications.inApp}
                 onToggle={() => isEditing && setTempData({
                   ...tempData, 
@@ -274,32 +289,27 @@ export const UserProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
-      <Modal 
-        isOpen={showConfirm} 
-        onClose={() => setShowConfirm(false)} 
-        title="ยืนยันการเปลี่ยนแปลง"
-      >
-        <div className="space-y-6 text-center">
-          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <AlertCircle className="w-10 h-10" />
+      <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="ยืนยันการบันทึก">
+        <div className="text-center space-y-8 p-4">
+          <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <AlertCircle className="w-12 h-12" />
           </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-slate-800">คุณแน่ใจหรือไม่?</h3>
-            <p className="text-slate-500">คุณต้องการบันทึกการเปลี่ยนแปลงข้อมูลโปรไฟล์เหล่านี้ใช่หรือไม่?</p>
+          <div>
+            <h3 className="text-2xl font-black text-slate-800 tracking-tighter mb-2">Are you sure?</h3>
+            <p className="text-slate-500 font-medium">คุณยืนยันที่จะบันทึกการเปลี่ยนแปลงข้อมูลทั้งหมดนี้ใช่หรือไม่?</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <button 
               onClick={() => setShowConfirm(false)}
-              className="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-all"
+              className="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all"
             >
-              ตรวจสอบอีกครั้ง
+              Cancel
             </button>
             <button 
               onClick={confirmSave}
-              className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
+              className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
             >
-              บันทึกทันที
+              Confirm & Save
             </button>
           </div>
         </div>
@@ -308,19 +318,18 @@ export const UserProfile: React.FC = () => {
   );
 };
 
-const NotificationToggle: React.FC<{ label: string, description: string, active: boolean, onToggle: () => void }> = ({ 
-  label, description, active, onToggle 
+const NotificationToggle: React.FC<{ label: string, active: boolean, onToggle: () => void }> = ({ 
+  label, active, onToggle 
 }) => (
-  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-blue-100 transition-all">
-    <div>
-      <p className="text-sm font-bold text-slate-700">{label}</p>
-      <p className="text-xs text-slate-400 mt-0.5">{description}</p>
+  <div 
+    onClick={onToggle}
+    className={`flex items-center justify-between p-6 rounded-3xl border transition-all cursor-pointer ${
+      active ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-slate-50 border-slate-50 text-slate-500 hover:border-slate-200'
+    }`}
+  >
+    <span className="text-sm font-bold uppercase tracking-tight">{label}</span>
+    <div className={`w-10 h-6 rounded-full relative transition-all ${active ? 'bg-white/30' : 'bg-slate-300'}`}>
+      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${active ? 'left-5' : 'left-1'}`} />
     </div>
-    <button 
-      onClick={onToggle}
-      className={`w-12 h-6 rounded-full transition-all relative ${active ? 'bg-blue-600' : 'bg-slate-300'}`}
-    >
-      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${active ? 'left-7' : 'left-1'}`} />
-    </button>
   </div>
 );

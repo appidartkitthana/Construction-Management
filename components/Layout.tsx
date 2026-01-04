@@ -11,7 +11,8 @@ import {
   Search,
   User,
   CalendarDays,
-  Menu
+  Menu,
+  MoreVertical
 } from 'lucide-react';
 import { View } from '../App';
 import { Contract } from '../types';
@@ -33,64 +34,65 @@ export const Layout: React.FC<LayoutProps> = ({
   onSelectProject
 }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'หน้าแรก', shortLabel: 'หน้าแรก', icon: LayoutDashboard },
-    { id: 'contracts', label: 'สัญญา', shortLabel: 'สัญญา', icon: FileText },
-    { id: 'full-calendar', label: 'ตารางงาน', shortLabel: 'ตาราง', icon: CalendarDays },
-    { id: 'projects', label: 'โครงการ', shortLabel: 'โครงการ', icon: HardHat },
-    { id: 'reports', label: 'รายงาน', shortLabel: 'รายงาน', icon: ClipboardCheck },
+    { id: 'dashboard', label: 'ภาพรวม', icon: LayoutDashboard },
+    { id: 'contracts', label: 'สัญญา', icon: FileText },
+    { id: 'full-calendar', label: 'ตารางงาน', icon: CalendarDays },
+    { id: 'projects', label: 'โครงการ', icon: HardHat },
+    { id: 'reports', label: 'รายงาน', icon: ClipboardCheck },
   ];
-
-  const vendorMenuItem = { id: 'vendors', label: 'คู่ค้า', icon: Truck };
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#F0F7FF] flex-col md:flex-row">
-      {/* Sidebar (Desktop Only) */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0">
-        <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
-            <HardHat className="text-white w-6 h-6" />
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-72 bg-white border-r border-slate-200 flex-col shrink-0 shadow-sm z-20">
+        <div className="p-8 border-b border-slate-50 flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-100">
+            <HardHat className="text-white w-7 h-7" />
           </div>
-          <span className="text-xl font-bold text-slate-800 tracking-tight uppercase">ArchiPro</span>
+          <div>
+            <span className="text-2xl font-black text-slate-800 tracking-tighter uppercase block leading-none">ArchiPro</span>
+            <span className="text-[10px] text-blue-500 font-bold tracking-[0.2em] uppercase">Enterprise</span>
+          </div>
         </div>
 
-        <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 py-8 px-4 space-y-2 overflow-y-auto custom-scrollbar">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id as View)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+              className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 group ${
                 currentView === item.id 
-                  ? 'bg-blue-50 text-blue-600 shadow-sm' 
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 translate-x-1' 
+                  : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${currentView === item.id ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
-              <span className="font-medium">{item.label}</span>
+              <item.icon className={`w-5 h-5 ${currentView === item.id ? 'text-white' : 'group-hover:text-blue-500'}`} />
+              <span className="font-bold text-sm tracking-tight">{item.label}</span>
             </button>
           ))}
           <button
             onClick={() => onNavigate('vendors')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+            className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 group ${
               currentView === 'vendors' 
-                ? 'bg-blue-50 text-blue-600 shadow-sm' 
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 translate-x-1' 
+                : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
             }`}
           >
-            <vendorMenuItem.icon className={`w-5 h-5 ${currentView === 'vendors' ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
-            <span className="font-medium">{vendorMenuItem.label}</span>
+            <Truck className={`w-5 h-5 ${currentView === 'vendors' ? 'text-white' : 'group-hover:text-blue-500'}`} />
+            <span className="font-bold text-sm tracking-tight">คู่ค้า/ผู้รับเหมา</span>
           </button>
         </nav>
 
-        <div className="p-4 border-t border-slate-100">
-          <div className="bg-slate-50 p-4 rounded-xl">
-            <p className="text-xs text-slate-400 uppercase font-semibold mb-2 text-[10px]">เลือกโครงการ</p>
+        <div className="p-6 border-t border-slate-50">
+          <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100">
+            <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-3">Project Active</p>
             <select 
               value={selectedProject?.id || ''} 
               onChange={(e) => {
                 const p = MOCK_CONTRACTS.find(c => c.id === e.target.value);
                 if (p) onSelectProject(p);
               }}
-              className="w-full bg-transparent text-sm font-medium text-slate-700 focus:outline-none cursor-pointer"
+              className="w-full bg-transparent text-sm font-bold text-slate-700 focus:outline-none cursor-pointer"
             >
               {MOCK_CONTRACTS.map(p => (
                 <option key={p.id} value={p.id}>{p.projectName}</option>
@@ -100,50 +102,40 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
       </aside>
 
-      {/* Main Area */}
-      <main className="flex-1 flex flex-col overflow-hidden pb-16 md:pb-0">
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
         {/* Top Header */}
-        <header className="h-16 md:h-20 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between shrink-0">
-          {/* Logo Mobile */}
-          <div className="flex items-center gap-2 md:hidden">
-             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                <HardHat className="text-white w-5 h-5" />
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 md:px-10 flex items-center justify-between shrink-0 z-10">
+          <div className="md:hidden flex items-center gap-3">
+             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                <HardHat className="text-white w-6 h-6" />
              </div>
-             <span className="text-lg font-bold text-slate-800 uppercase tracking-tighter">ArchiPro</span>
+             <span className="text-xl font-black text-slate-800 uppercase tracking-tighter">ArchiPro</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 text-slate-400">
-            <span className="text-xs">หน้าหลัก</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-xs font-medium text-slate-700 capitalize">
-              {menuItems.find(m => m.id === currentView)?.label || (currentView === 'profile' ? 'โปรไฟล์ผู้ใช้' : 'บริหารงาน')}
+          <div className="hidden md:flex items-center gap-3 text-slate-300">
+            <span className="text-xs font-bold uppercase tracking-wider">Archi</span>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              {menuItems.find(m => m.id === currentView)?.label || 'Profile'}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-6">
-            <div className="hidden lg:relative lg:block">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="ค้นหา..." 
-                className="bg-slate-50 border-none rounded-full py-2 pl-10 pr-4 w-48 text-sm focus:ring-2 focus:ring-blue-100 transition-all"
-              />
-            </div>
-            
-            <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors relative">
+          <div className="flex items-center gap-4 md:gap-8">
+            <button className="p-2.5 text-slate-400 hover:text-blue-600 transition-colors relative bg-slate-50 rounded-xl">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
 
             <div 
-              className="flex items-center gap-2 md:gap-3 md:pl-6 md:border-l md:border-slate-200 cursor-pointer group"
+              className="flex items-center gap-3 md:pl-8 md:border-l md:border-slate-100 cursor-pointer group"
               onClick={() => onNavigate('profile')}
             >
               <div className="hidden md:block text-right">
-                <p className="text-sm font-bold text-slate-800 leading-none group-hover:text-blue-600 transition-colors">อนันต์ เค.</p>
-                <p className="text-[10px] text-slate-500">Project Manager</p>
+                <p className="text-sm font-black text-slate-800 leading-none group-hover:text-blue-600 transition-colors">อนันต์ เค.</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">Project Manager</p>
               </div>
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm overflow-hidden transition-transform group-hover:scale-105">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-black border-4 border-white shadow-lg shadow-blue-100 overflow-hidden transition-all group-hover:scale-110 group-active:scale-95">
                 AK
               </div>
             </div>
@@ -151,39 +143,37 @@ export const Layout: React.FC<LayoutProps> = ({
         </header>
 
         {/* Dynamic Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
-          {children}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-10 pb-24 md:pb-10">
+          <div className="max-w-[1400px] mx-auto h-full">
+            {children}
+          </div>
         </div>
-      </main>
 
-      {/* Bottom Navigation (Mobile Only) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex justify-around items-center z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
-        {menuItems.map((item) => (
+        {/* Bottom Navigation (Mobile Only) */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-4 py-3 flex justify-around items-center z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] rounded-t-[2.5rem]">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.id as View)}
+              className={`flex flex-col items-center gap-1.5 px-4 py-1 rounded-2xl transition-all duration-300 ${
+                currentView === item.id ? 'text-blue-600 bg-blue-50/50' : 'text-slate-400'
+              }`}
+            >
+              <item.icon className={`w-5 h-5 ${currentView === item.id ? 'scale-110' : ''}`} />
+              <span className="text-[9px] font-black uppercase tracking-tighter">{item.label}</span>
+            </button>
+          ))}
           <button
-            key={item.id}
-            onClick={() => onNavigate(item.id as View)}
-            className={`flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all ${
-              currentView === item.id ? 'text-blue-600' : 'text-slate-400'
-            }`}
-          >
-            <item.icon className={`w-5 h-5 ${currentView === item.id ? 'scale-110' : ''} transition-transform`} />
-            <span className="text-[10px] font-bold">{item.shortLabel}</span>
-            {currentView === item.id && (
-              <div className="w-1 h-1 bg-blue-600 rounded-full"></div>
-            )}
-          </button>
-        ))}
-        {/* Extra Menu for Mobile (Vendors etc) */}
-        <button
             onClick={() => onNavigate('vendors')}
-            className={`flex flex-col items-center gap-1 px-3 py-1 transition-all ${
-              currentView === 'vendors' ? 'text-blue-600' : 'text-slate-400'
+            className={`flex flex-col items-center gap-1.5 px-4 py-1 rounded-2xl transition-all ${
+              currentView === 'vendors' ? 'text-blue-600 bg-blue-50/50' : 'text-slate-400'
             }`}
           >
             <Menu className="w-5 h-5" />
-            <span className="text-[10px] font-bold">เพิ่มเติม</span>
+            <span className="text-[9px] font-black uppercase tracking-tighter">เมนู</span>
           </button>
-      </nav>
+        </nav>
+      </main>
     </div>
   );
 };
